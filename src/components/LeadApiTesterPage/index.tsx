@@ -171,7 +171,7 @@ export default function LeadApiTesterPage() {
             <div className="flex items-center gap-3 md:gap-4 mb-2">
                 <Image src="/images/logo.png" alt="BUV Logo" width={80} height={40} className="object-contain" />
                 <h3 className="text-primary font-semibold whitespace-nowrap">
-                    Lead API Tester - Salesforce Org PROD
+                    Lead API Tester - Salesforce Org DEV
                 </h3>
                 <div className="flex-1 border-b border-dashed border-primary mr-1" />
             </div>
