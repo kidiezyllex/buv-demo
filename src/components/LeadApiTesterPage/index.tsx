@@ -40,6 +40,8 @@ import {
     YOU_ARE_OPTIONS,
 } from "@/interface/leadApi";
 import { leadApi } from "@/api/leadApi";
+import { useTokenStore } from "@/store/useTokenStore";
+import { useEffect } from "react";
 
 const REQUIRED_FIELDS: { key: keyof ILeadApiPayload; label: string }[] = [
     { key: "LastName", label: "Tên (FullName)" },
@@ -99,8 +101,6 @@ const PROVINCES = [
     { label: "Tỉnh Vĩnh Long", value: "a0Udb000004TOoPEAW" },
 ];
 
-// Chỉ dùng cho APICreateLead - danh sách rút gọn, đã xác nhận map dữ liệu đầy đủ
-// (Category/Campus Group/Group Programme) không bị lỗi thiếu dữ liệu tham chiếu trên org.
 const PROGRAMMES = [
     { label: "BSc (Hons) Computer Science", value: "01tdc000001npX3AAI" },
 ];
@@ -108,9 +108,19 @@ const PROGRAMMES = [
 export default function LeadApiTesterPage() {
     const [endpoint, setEndpoint] = useState<LeadApiEndpointKey>("create-lead");
     const [form, setForm] = useState<ILeadApiPayload>(DEFAULT_FORM);
-    const [sfToken, setSfToken] = useState<string>("");
+
+    const {
+        accessToken: sfToken,
+        fetchToken
+    } = useTokenStore();
+
     const [isSending, setIsSending] = useState(false);
     const [result, setResult] = useState<ILeadApiResult | null>(null);
+
+    useEffect(() => {
+        // Tự động kiểm tra và lấy token nếu chưa có hoặc đã hết hạn (không ép buộc refresh)
+        fetchToken().catch(() => { });
+    }, [fetchToken]);
 
     const selectedEndpoint = useMemo(
         () => LEAD_API_ENDPOINTS.find((item) => item.key === endpoint),
@@ -131,6 +141,8 @@ export default function LeadApiTesterPage() {
 
         return base;
     };
+
+
 
     const handleSend = async () => {
         const payload = buildPayload();
@@ -200,22 +212,13 @@ export default function LeadApiTesterPage() {
                                 </SelectContent>
                             </Select>
                             {selectedEndpoint && (
-                                <p className="text-sm text-neutral-500 mt-1 italic">
+                                <p className="text-sm text-neutral-600 mt-1 italic">
                                     {selectedEndpoint.description}
                                 </p>
                             )}
                         </div>
 
-                        <div>
-                            <Label htmlFor="sfToken" className="mb-1 block">SF_ACCESS_TOKEN (Tùy chọn ghi đè)</Label>
-                            <Input
-                                id="sfToken"
-                                value={sfToken}
-                                onChange={(e) => setSfToken(e.target.value)}
-                                placeholder="Dán token vào đây nếu token ở .env bị hết hạn..."
-                                type="text"
-                            />
-                        </div>
+
 
                         <div className="flex items-center gap-3 md:gap-4">
                             <h3 className="text-primary font-semibold whitespace-nowrap">7 trường bắt buộc</h3>
@@ -305,7 +308,6 @@ export default function LeadApiTesterPage() {
                                     id="LeadSource"
                                     value={form.LeadSource as string}
                                     onChange={(e) => updateField("LeadSource", e.target.value)}
-                                    placeholder="MarComm"
                                 />
                             </div>
                         </div>
