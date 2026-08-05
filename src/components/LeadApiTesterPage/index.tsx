@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import {
     Card,
     CardContent,
@@ -58,8 +59,6 @@ const DEFAULT_FORM: ILeadApiPayload = {
     DOB__c: "",
     City_or_Province__c: "",
     LeadSource: "MarComm",
-    Interested_Programme__c: "",
-    Interested_Category__c: "",
 };
 
 const PROVINCES = [
@@ -102,7 +101,6 @@ const PROVINCES = [
 export default function LeadApiTesterPage() {
     const [endpoint, setEndpoint] = useState<LeadApiEndpointKey>("create-lead");
     const [form, setForm] = useState<ILeadApiPayload>(DEFAULT_FORM);
-    const [extraJson, setExtraJson] = useState("{}");
     const [isSending, setIsSending] = useState(false);
     const [result, setResult] = useState<ILeadApiResult | null>(null);
 
@@ -115,15 +113,7 @@ export default function LeadApiTesterPage() {
         setForm((prev) => ({ ...prev, [key]: value }));
     };
 
-    const buildPayload = (): Record<string, unknown> | null => {
-        let extra: Record<string, unknown> = {};
-        try {
-            extra = extraJson.trim() ? JSON.parse(extraJson) : {};
-        } catch {
-            toast.error("Trường JSON bổ sung không hợp lệ");
-            return null;
-        }
-
+    const buildPayload = (): Record<string, unknown> => {
         const base: Record<string, unknown> = {};
         Object.entries(form).forEach(([key, value]) => {
             if (value !== "" && value !== undefined) {
@@ -131,12 +121,11 @@ export default function LeadApiTesterPage() {
             }
         });
 
-        return { ...base, ...extra };
+        return base;
     };
 
     const handleSend = async () => {
         const payload = buildPayload();
-        if (!payload) return;
 
         setIsSending(true);
         setResult(null);
@@ -171,7 +160,8 @@ export default function LeadApiTesterPage() {
 
     return (
         <div className="space-y-3 md:space-y-4 bg-darkCardV1 p-3 md:p-4 min-h-[80vh]">
-            <div className="flex items-center gap-3 md:gap-4">
+            <div className="flex items-center gap-3 md:gap-4 mb-2">
+                <Image src="/images/logo.png" alt="BUV Logo" width={80} height={40} className="object-contain" />
                 <h3 className="text-primary font-semibold whitespace-nowrap">
                     Lead API Tester - Salesforce
                 </h3>
@@ -299,43 +289,6 @@ export default function LeadApiTesterPage() {
                                     placeholder="MarComm"
                                 />
                             </div>
-                        </div>
-
-                        <div className="flex items-center gap-3 md:gap-4">
-                            <h3 className="text-primary font-semibold whitespace-nowrap">Thông tin bổ sung</h3>
-                            <div className="flex-1 border-b border-dashed border-primary mr-1" />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                            <div>
-                                <Label htmlFor="Interested_Programme__c">Interested Programme (Product2 Id)</Label>
-                                <Input
-                                    id="Interested_Programme__c"
-                                    value={form.Interested_Programme__c as string}
-                                    onChange={(e) => updateField("Interested_Programme__c", e.target.value)}
-                                    placeholder="01txxxxxxxxxxxx"
-                                />
-                            </div>
-                            <div>
-                                <Label htmlFor="Interested_Category__c">Interested Category</Label>
-                                <Input
-                                    id="Interested_Category__c"
-                                    value={form.Interested_Category__c as string}
-                                    onChange={(e) => updateField("Interested_Category__c", e.target.value)}
-                                    placeholder="Tên category"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <Label htmlFor="extraJson">JSON bổ sung (override / field khác)</Label>
-                            <Textarea
-                                id="extraJson"
-                                value={extraJson}
-                                onChange={(e) => setExtraJson(e.target.value)}
-                                rows={4}
-                                placeholder='{"FirstName": "A"}'
-                            />
                         </div>
 
                         <Button onClick={handleSend} disabled={isSending} className="w-full">
