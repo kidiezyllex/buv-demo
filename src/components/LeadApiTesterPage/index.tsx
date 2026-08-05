@@ -59,6 +59,7 @@ const DEFAULT_FORM: ILeadApiPayload = {
     DOB__c: "",
     City_or_Province__c: "",
     LeadSource: "MarComm",
+    Interested_Programme__c: "",
 };
 
 const PROVINCES = [
@@ -96,6 +97,12 @@ const PROVINCES = [
     { label: "Tỉnh Thanh Hóa", value: "a0Udb000004TOoBEAW" },
     { label: "Tỉnh Tuyên Quang", value: "a0Udb000004TOnyEAG" },
     { label: "Tỉnh Vĩnh Long", value: "a0Udb000004TOoPEAW" },
+];
+
+// Chỉ dùng cho APICreateLead - danh sách rút gọn, đã xác nhận map dữ liệu đầy đủ
+// (Category/Campus Group/Group Programme) không bị lỗi thiếu dữ liệu tham chiếu trên org.
+const PROGRAMMES = [
+    { label: "BSc (Hons) Computer Science", value: "01tdc000001npX3AAI" },
 ];
 
 export default function LeadApiTesterPage() {
@@ -273,7 +280,7 @@ export default function LeadApiTesterPage() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {PROVINCES.map((option) => (
-                                            <SelectItem key={option.value} value={option.value}>
+                                            <SelectItem key={option.value} value={option.label}>
                                                 {option.label}
                                             </SelectItem>
                                         ))}
@@ -290,6 +297,27 @@ export default function LeadApiTesterPage() {
                                 />
                             </div>
                         </div>
+
+                        {endpoint === "create-lead" && (
+                            <div>
+                                <Label htmlFor="Interested_Programme__c">Chương trình quan tâm</Label>
+                                <Select
+                                    value={(form.Interested_Programme__c as string) || undefined}
+                                    onValueChange={(v) => updateField("Interested_Programme__c", v)}
+                                >
+                                    <SelectTrigger id="Interested_Programme__c">
+                                        <SelectValue placeholder="Chọn chương trình (không bắt buộc)" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {PROGRAMMES.map((option) => (
+                                            <SelectItem key={option.value} value={option.value}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
 
                         <Button onClick={handleSend} disabled={isSending} className="w-full">
                             <Icon path={isSending ? mdiLoading : mdiSend} size={0.8} className={isSending ? "animate-spin flex-shrink-0" : "flex-shrink-0"} />
