@@ -95,18 +95,18 @@ export function DatePicker({
       <PopoverTrigger asChild>
         <Button
           className={cn(
-            "w-full justify-start h-10 text-left font-normal border border-darkBorderV1 bg-darkBorderV1/50 hover:bg-darkCardV1 hover:border-primary/30 transition-all",
-            !date && "text-neutral-300",
-            date && "text-neutral-300",
+            "w-full justify-start h-10 text-left font-normal border border-gray-300 bg-white hover:bg-gray-50 hover:border-primary/30 transition-all",
+            !date && "text-gray-500",
+            date && "text-gray-900",
             className
           )}
           disabled={disabled}
         >
-          <CalendarIcon className="h-4 w-4 text-neutral-300 mr-2" />
+          <CalendarIcon className="h-4 w-4 text-gray-500 mr-2" />
           <span>{formatDisplay()}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0 bg-darkCardV1 border-darkBorderV1">
+      <PopoverContent className="w-auto p-0 bg-white border-gray-200">
         <div className="flex overflow-hidden rounded-2xl">
           <Calendar
             mode="single"
@@ -118,10 +118,10 @@ export function DatePicker({
             toYear={toYear}
           />
           {withTime && (
-            <div className="border-l border-darkBorderV1 bg-darkBackgroundV1 p-3 flex flex-col justify-start min-w-[160px]">
+            <div className="border-l border-gray-200 bg-gray-50 p-3 flex flex-col justify-start min-w-[160px]">
               <div className="space-y-2">
                 <Label htmlFor="time-input" className="flex flex-row items-center gap-2 normal-case">
-                  <Clock className="h-3.5 w-3.5 text-neutral-300" />
+                  <Clock className="h-3.5 w-3.5 text-gray-700" />
                   Nhập khung giờ
                 </Label>
                 <Input
@@ -129,7 +129,7 @@ export function DatePicker({
                   type="time"
                   value={timeValue}
                   onChange={handleTimeChange}
-                  className="h-10 bg-darkCardV1 border-darkBorderV1 text-neutral-300 focus:border-primary/50 appearance-none [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                  className="h-10 bg-white border-gray-300 text-gray-900 focus:border-primary/50 appearance-none [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                 />
               </div>
             </div>

@@ -8,9 +8,9 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-darkBorderV1 text-darkBorderV1 text-nowrap",
+        default: "border-gray-200 text-gray-700 text-nowrap",
         secondary:
-          "border-darkBorderV1 bg-secondary text-secondary-foreground hover:bg-secondary/80 text-neutral-300 text-nowrap",
+          "border-gray-200 bg-secondary text-secondary-foreground hover:bg-secondary/80 text-gray-700 text-nowrap",
         destructive:
           "bg-red-500/10 text-red-400 border-red-500/20 rounded-md px-1.5 py-0 text-xs font-bold",
         orange:
@@ -48,7 +48,7 @@ const badgeVariants = cva(
         stone:
           "bg-stone-500/10 text-stone-400 border-stone-500/20 rounded-md px-1.5 py-0 text-xs font-bold",
         ghost:
-          "hover:text-neutral-300 border-darkBorderV1 bg-darkBorderV1 text-neutral-300",
+          "hover:text-gray-900 border-gray-200 bg-gray-100 text-gray-700",
       },
     },
     defaultVariants: {

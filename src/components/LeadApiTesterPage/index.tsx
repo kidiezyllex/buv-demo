@@ -42,7 +42,7 @@ import {
 import { leadApi } from "@/api/leadApi";
 
 const REQUIRED_FIELDS: { key: keyof ILeadApiPayload; label: string }[] = [
-    { key: "LastName", label: "Tên (LastName)" },
+    { key: "LastName", label: "Tên (FullName)" },
     { key: "Email", label: "Email" },
     { key: "MobilePhone", label: "Số điện thoại (MobilePhone)" },
     { key: "You_are__c", label: "Vai trò (You are?)" },
@@ -166,7 +166,7 @@ export default function LeadApiTesterPage() {
     const isSuccess = result && result.status >= 200 && result.status < 300 && !result.errorCode;
 
     return (
-        <div className="space-y-3 md:space-y-4 bg-darkCardV1 p-3 md:p-4 min-h-[80vh]">
+        <div className="space-y-3 md:space-y-4 bg-gray-100 p-3 md:p-4 min-h-[80vh]">
             <div className="flex items-center gap-3 md:gap-4 mb-2">
                 <Image src="/images/logo.png" alt="BUV Logo" width={80} height={40} className="object-contain" />
                 <h3 className="text-primary font-semibold whitespace-nowrap">
@@ -177,7 +177,7 @@ export default function LeadApiTesterPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
                 <Card>
-                    <CardHeader className="border-b border-b-darkBorderV1 py-3">
+                    <CardHeader className="border-b border-b-gray-200 py-3">
                         <div className="flex items-center gap-2">
                             <Icon path={mdiAccountSchool} size={0.8} className="text-primary flex-shrink-0" />
                             <span className="font-semibold text-primary">Request</span>
@@ -199,7 +199,7 @@ export default function LeadApiTesterPage() {
                                 </SelectContent>
                             </Select>
                             {selectedEndpoint && (
-                                <p className="text-sm text-neutral-400 mt-1 italic">
+                                <p className="text-sm text-neutral-500 mt-1 italic">
                                     {selectedEndpoint.description}
                                 </p>
                             )}
@@ -212,7 +212,7 @@ export default function LeadApiTesterPage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                             <div>
-                                <Label htmlFor="LastName">Tên (LastName)</Label>
+                                <Label htmlFor="LastName">Tên (FullName)</Label>
                                 <Input
                                     id="LastName"
                                     value={form.LastName as string}
@@ -327,7 +327,7 @@ export default function LeadApiTesterPage() {
                 </Card>
 
                 <Card>
-                    <CardHeader className="border-b border-b-darkBorderV1 py-3">
+                    <CardHeader className="border-b border-b-gray-200 py-3">
                         <div className="flex items-center gap-2">
                             <Icon path={mdiCodeJson} size={0.8} className="text-primary flex-shrink-0" />
                             <span className="font-semibold text-primary">Response</span>
@@ -335,7 +335,7 @@ export default function LeadApiTesterPage() {
                     </CardHeader>
                     <CardContent className="space-y-3 md:space-y-4">
                         {!result && (
-                            <div className="text-center text-neutral-400 text-base py-2 italic flex items-center justify-center gap-2">
+                            <div className="text-center text-neutral-500 text-base py-2 italic flex items-center justify-center gap-2">
                                 <Icon path={mdiCodeJson} size={1} className="flex-shrink-0" />
                                 Chưa có response nào
                             </div>
