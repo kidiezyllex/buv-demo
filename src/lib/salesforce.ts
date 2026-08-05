@@ -37,3 +37,30 @@ export async function callSalesforceRest(urlMapping: string, payload: unknown, c
 
     return { status: res.status, ok: res.ok, data: json };
 }
+
+export async function querySalesforce(soql: string, customToken?: string) {
+    const token = customToken || SF_ACCESS_TOKEN;
+    if (!SF_INSTANCE_URL || !token) {
+        throw new Error("Thiếu SF_INSTANCE_URL / SF_ACCESS_TOKEN");
+    }
+
+    const res = await fetch(
+        `${SF_INSTANCE_URL}/services/data/v60.0/query?q=${encodeURIComponent(soql)}`,
+        {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    const text = await res.text();
+    let json: any;
+    try {
+        json = JSON.parse(text);
+    } catch {
+        json = { raw: text };
+    }
+
+    return { status: res.status, ok: res.ok, data: json };
+}

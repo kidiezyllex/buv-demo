@@ -12,5 +12,14 @@ export const leadApi = {
         return axios
             .post(`/api/lead-proxy/${endpoint}`, payload, { validateStatus: () => true, headers })
             .then((res) => ({ status: res.status, body: res.data }));
-    }
+    },
+    getProgrammes: (sfToken?: string) => {
+        const headers: Record<string, string> = {};
+        if (sfToken) {
+            headers["x-sf-access-token"] = sfToken;
+        }
+        return axios
+            .get("/api/products", { headers })
+            .then((res) => res.data?.programmes as { label: string; value: string }[]);
+    },
 };

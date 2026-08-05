@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import {
     Card,
@@ -41,7 +41,6 @@ import {
 } from "@/interface/leadApi";
 import { leadApi } from "@/api/leadApi";
 import { useTokenStore } from "@/store/useTokenStore";
-import { useEffect } from "react";
 
 const REQUIRED_FIELDS: { key: keyof ILeadApiPayload; label: string }[] = [
     { key: "LastName", label: "Tên (FullName)" },
@@ -60,7 +59,7 @@ const DEFAULT_FORM: ILeadApiPayload = {
     You_are__c: "",
     DOB__c: "",
     City_or_Province__c: "",
-    LeadSource: "MarComm",
+    LeadSource: "",
     Interested_Programme__c: "",
 };
 
@@ -101,13 +100,11 @@ const PROVINCES = [
     { label: "Tỉnh Vĩnh Long", value: "a0Udb000004TOoPEAW" },
 ];
 
-const PROGRAMMES = [
-    { label: "BSc (Hons) Computer Science", value: "01tdc000001npX3AAI" },
-];
-
 export default function LeadApiTesterPage() {
     const [endpoint, setEndpoint] = useState<LeadApiEndpointKey>("create-lead");
     const [form, setForm] = useState<ILeadApiPayload>(DEFAULT_FORM);
+    const [programmes, setProgrammes] = useState<{ label: string; value: string }[]>([]);
+    const [isLoadingProgrammes, setIsLoadingProgrammes] = useState(false);
 
     const {
         accessToken: sfToken,
@@ -121,6 +118,16 @@ export default function LeadApiTesterPage() {
         // Tự động kiểm tra và lấy token nếu chưa có hoặc đã hết hạn (không ép buộc refresh)
         fetchToken().catch(() => { });
     }, [fetchToken]);
+
+    useEffect(() => {
+        if (!sfToken) return;
+        setIsLoadingProgrammes(true);
+        leadApi
+            .getProgrammes(sfToken)
+            .then((data) => setProgrammes(data || []))
+            .catch(() => toast.error("Không lấy được danh sách chương trình từ Salesforce"))
+            .finally(() => setIsLoadingProgrammes(false));
+    }, [sfToken]);
 
     const selectedEndpoint = useMemo(
         () => LEAD_API_ENDPOINTS.find((item) => item.key === endpoint),
@@ -258,12 +265,13 @@ export default function LeadApiTesterPage() {
                                 <Label htmlFor="You_are__c">Vai trò (You are?)</Label>
                                 <Select
                                     value={(form.You_are__c as string) || undefined}
-                                    onValueChange={(v) => updateField("You_are__c", v)}
+                                    onValueChange={(v) => updateField("You_are__c", v === "none" ? "" : v)}
                                 >
                                     <SelectTrigger id="You_are__c">
                                         <SelectValue placeholder="Chọn vai trò" />
                                     </SelectTrigger>
                                     <SelectContent>
+                                        <SelectItem value="none">-- Không chọn --</SelectItem>
                                         {YOU_ARE_OPTIONS.map((option) => (
                                             <SelectItem key={option} value={option}>
                                                 {option}
@@ -288,12 +296,13 @@ export default function LeadApiTesterPage() {
                                 <Label htmlFor="City_or_Province__c">Tỉnh/Thành phố</Label>
                                 <Select
                                     value={(form.City_or_Province__c as string) || undefined}
-                                    onValueChange={(v) => updateField("City_or_Province__c", v)}
+                                    onValueChange={(v) => updateField("City_or_Province__c", v === "none" ? "" : v)}
                                 >
                                     <SelectTrigger id="City_or_Province__c">
                                         <SelectValue placeholder="Chọn tỉnh/thành phố" />
                                     </SelectTrigger>
                                     <SelectContent>
+                                        <SelectItem value="none">-- Không chọn --</SelectItem>
                                         {PROVINCES.map((option) => (
                                             <SelectItem key={option.value} value={option.label}>
                                                 {option.label}
@@ -318,12 +327,19 @@ export default function LeadApiTesterPage() {
                                 <Select
                                     value={(form.Interested_Programme__c as string) || undefined}
                                     onValueChange={(v) => updateField("Interested_Programme__c", v)}
+                                    disabled={isLoadingProgrammes}
                                 >
                                     <SelectTrigger id="Interested_Programme__c">
-                                        <SelectValue placeholder="Chọn chương trình (không bắt buộc)" />
+                                        <SelectValue
+                                            placeholder={
+                                                isLoadingProgrammes
+                                                    ? "Đang tải danh sách chương trình..."
+                                                    : "Chọn chương trình (không bắt buộc)"
+                                            }
+                                        />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {PROGRAMMES.map((option) => (
+                                        {programmes.map((option) => (
                                             <SelectItem key={option.value} value={option.value}>
                                                 {option.label}
                                             </SelectItem>
