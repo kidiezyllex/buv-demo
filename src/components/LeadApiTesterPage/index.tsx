@@ -62,6 +62,43 @@ const DEFAULT_FORM: ILeadApiPayload = {
     Interested_Category__c: "",
 };
 
+const PROVINCES = [
+    { label: "Thành phố Cần Thơ", value: "a0Udb000004TOoREAW" },
+    { label: "Thành phố Đà Nẵng", value: "a0Udb000004TOoGEAW" },
+    { label: "Thành phố Hà Nội", value: "a0Udb000004TOnwEAG" },
+    { label: "Thành phố Hải Phòng", value: "a0Udb000004TOo8EAG" },
+    { label: "Thành phố Hồ Chí Minh", value: "a0Udb000004TFd4EAG" },
+    { label: "Thành phố Huế", value: "a0Udb000004TOoFEAW" },
+    { label: "Tỉnh An Giang", value: "a0Udb000004TOoQEAW" },
+    { label: "Tỉnh Bắc Ninh", value: "a0Udb000004TOo6EAG" },
+    { label: "Tỉnh Cà Mau", value: "a0Udb000004TOoSEAW" },
+    { label: "Tỉnh Cao Bằng", value: "a0Udb000004TOnxEAG" },
+    { label: "Tỉnh Đắk Lắk", value: "a0Udb000004TOoKEAW" },
+    { label: "Tỉnh Điện Biên", value: "a0Udb000004TOnzEAG" },
+    { label: "Tỉnh Đồng Nai", value: "a0Udb000004TOoMEAW" },
+    { label: "Tỉnh Đồng Tháp", value: "a0Udb000004TOoOEAW" },
+    { label: "Tỉnh Gia Lai", value: "a0Udb000004TOoIEAW" },
+    { label: "Tỉnh Hà Tĩnh", value: "a0Udb000004TOoDEAW" },
+    { label: "Tỉnh Hưng Yên", value: "a0Udb000004TOo9EAG" },
+    { label: "Tỉnh Khánh Hòa", value: "a0Udb000004TOoJEAW" },
+    { label: "Tỉnh Lai Châu", value: "a0Udb000004TOo0EAG" },
+    { label: "Tỉnh Lạng Sơn", value: "a0Udb000004TOo4EAG" },
+    { label: "Tỉnh Lào Cai", value: "a0Udb000004TOo2EAG" },
+    { label: "Tỉnh Lâm Đồng", value: "a0Udb000004TOoLEAW" },
+    { label: "Tỉnh Nghệ An", value: "a0Udb000004TOoCEAW" },
+    { label: "Tỉnh Ninh Bình", value: "a0Udb000004TOoAEAW" },
+    { label: "Tỉnh Phú Thọ", value: "a0Udb000004TOo7EAG" },
+    { label: "Tỉnh Quảng Ngãi", value: "a0Udb000004TOoHEAW" },
+    { label: "Tỉnh Quảng Ninh", value: "a0Udb000004TOo5EAG" },
+    { label: "Tỉnh Quảng Trị", value: "a0Udb000004TOoEEAW" },
+    { label: "Tỉnh Sơn La", value: "a0Udb000004TOo1EAG" },
+    { label: "Tỉnh Tây Ninh", value: "a0Udb000004TOoNEAW" },
+    { label: "Tỉnh Thái Nguyên", value: "a0Udb000004TOo3EAG" },
+    { label: "Tỉnh Thanh Hóa", value: "a0Udb000004TOoBEAW" },
+    { label: "Tỉnh Tuyên Quang", value: "a0Udb000004TOnyEAG" },
+    { label: "Tỉnh Vĩnh Long", value: "a0Udb000004TOoPEAW" },
+];
+
 export default function LeadApiTesterPage() {
     const [endpoint, setEndpoint] = useState<LeadApiEndpointKey>("create-lead");
     const [form, setForm] = useState<ILeadApiPayload>(DEFAULT_FORM);
@@ -237,12 +274,21 @@ export default function LeadApiTesterPage() {
                             </div>
                             <div>
                                 <Label htmlFor="City_or_Province__c">Tỉnh/Thành phố</Label>
-                                <Input
-                                    id="City_or_Province__c"
-                                    value={form.City_or_Province__c as string}
-                                    onChange={(e) => updateField("City_or_Province__c", e.target.value)}
-                                    placeholder="Ha Noi"
-                                />
+                                <Select
+                                    value={(form.City_or_Province__c as string) || undefined}
+                                    onValueChange={(v) => updateField("City_or_Province__c", v)}
+                                >
+                                    <SelectTrigger id="City_or_Province__c">
+                                        <SelectValue placeholder="Chọn tỉnh/thành phố" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {PROVINCES.map((option) => (
+                                            <SelectItem key={option.value} value={option.value}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                             <div>
                                 <Label htmlFor="LeadSource">Nguồn Lead</Label>

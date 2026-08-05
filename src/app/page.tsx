@@ -1,11 +1,9 @@
-import { redirect } from 'next/navigation'
+import LeadApiTesterPage from "@/components/LeadApiTesterPage";
 
 export default function HomePage() {
-  redirect('/auth/login')
+  return (
+    <main className="h-screen overflow-y-auto">
+      <LeadApiTesterPage />
+    </main>
+  );
 }
-
-
-
-
-
-
