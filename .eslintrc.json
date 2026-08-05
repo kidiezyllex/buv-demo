@@ -1,0 +1,30 @@
+{
+	"extends": [
+		"next/core-web-vitals",
+		"plugin:tailwindcss/recommended"
+	],
+	"rules": {
+		"@typescript-eslint/no-unused-vars": "off",
+		"no-unused-vars": "off",
+		"tailwindcss/no-redundant-variant-modifiers": "warn",
+		"tailwindcss/classnames-order": "warn",
+		"no-multiple-empty-lines": [
+			"error",
+			{
+				"max": 1,
+				"maxEOF": 0
+			}
+		]
+	},
+	"settings": {
+		"tailwindcss": {
+			"callees": [
+				"clsx",
+				"cva",
+				"cn",
+				"twMerge"
+			],
+			"config": "tailwind.config.ts"
+		}
+	}
+}
