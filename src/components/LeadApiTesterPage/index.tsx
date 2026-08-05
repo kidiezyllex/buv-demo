@@ -108,6 +108,7 @@ const PROGRAMMES = [
 export default function LeadApiTesterPage() {
     const [endpoint, setEndpoint] = useState<LeadApiEndpointKey>("create-lead");
     const [form, setForm] = useState<ILeadApiPayload>(DEFAULT_FORM);
+    const [sfToken, setSfToken] = useState<string>("");
     const [isSending, setIsSending] = useState(false);
     const [result, setResult] = useState<ILeadApiResult | null>(null);
 
@@ -137,7 +138,7 @@ export default function LeadApiTesterPage() {
         setIsSending(true);
         setResult(null);
         try {
-            const { status, body } = await leadApi.callEndpoint(endpoint, payload);
+            const { status, body } = await leadApi.callEndpoint(endpoint, payload, sfToken);
             setResult({
                 status,
                 message: body?.Message || body?.message,
@@ -170,7 +171,7 @@ export default function LeadApiTesterPage() {
             <div className="flex items-center gap-3 md:gap-4 mb-2">
                 <Image src="/images/logo.png" alt="BUV Logo" width={80} height={40} className="object-contain" />
                 <h3 className="text-primary font-semibold whitespace-nowrap">
-                    Lead API Tester - Salesforce
+                    Lead API Tester - Salesforce Org PROD
                 </h3>
                 <div className="flex-1 border-b border-dashed border-primary mr-1" />
             </div>
@@ -203,6 +204,17 @@ export default function LeadApiTesterPage() {
                                     {selectedEndpoint.description}
                                 </p>
                             )}
+                        </div>
+
+                        <div>
+                            <Label htmlFor="sfToken" className="mb-1 block">SF_ACCESS_TOKEN (Tùy chọn ghi đè)</Label>
+                            <Input
+                                id="sfToken"
+                                value={sfToken}
+                                onChange={(e) => setSfToken(e.target.value)}
+                                placeholder="Dán token vào đây nếu token ở .env bị hết hạn..."
+                                type="text"
+                            />
                         </div>
 
                         <div className="flex items-center gap-3 md:gap-4">

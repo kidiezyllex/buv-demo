@@ -27,8 +27,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ end
         return NextResponse.json({ message: "Request body không phải JSON hợp lệ" }, { status: 400 });
     }
 
+    const customToken = req.headers.get("x-sf-access-token") || undefined;
+
     try {
-        const result = await callSalesforceRest(urlMapping, payload);
+        const result = await callSalesforceRest(urlMapping, payload, customToken);
         return NextResponse.json(result.data, { status: result.status });
     } catch (error: any) {
         return NextResponse.json(

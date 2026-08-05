@@ -2,16 +2,17 @@ const SF_INSTANCE_URL = process.env.SF_INSTANCE_URL;
 const SF_ACCESS_TOKEN = process.env.SF_ACCESS_TOKEN;
 const SF_LEAD_TOKEN = process.env.SF_LEAD_TOKEN;
 
-export async function callSalesforceRest(urlMapping: string, payload: unknown) {
-    if (!SF_INSTANCE_URL || !SF_ACCESS_TOKEN) {
-        throw new Error("Thiếu SF_INSTANCE_URL / SF_ACCESS_TOKEN trong biến môi trường");
+export async function callSalesforceRest(urlMapping: string, payload: unknown, customToken?: string) {
+    const token = customToken || SF_ACCESS_TOKEN;
+    if (!SF_INSTANCE_URL || !token) {
+        throw new Error("Thiếu SF_INSTANCE_URL / SF_ACCESS_TOKEN");
     }
 
     const res = await fetch(`${SF_INSTANCE_URL}/services/apexrest/${urlMapping}/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${SF_ACCESS_TOKEN}`,
+            Authorization: `Bearer ${token}`,
             ...(SF_LEAD_TOKEN ? { authorizationpermanent: SF_LEAD_TOKEN } : {}),
         },
         body: JSON.stringify(payload),
