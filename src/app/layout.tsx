@@ -8,8 +8,8 @@ import { Metadata } from 'next'
 import NextTopLoader from 'nextjs-toploader'
 
 export const metadata: Metadata = {
-  title: 'CompanyManagement - Hệ thống quản lý doanh nghiệp thông minh',
-  description: 'Giải pháp quản lý nhân sự, thiết bị, công việc và đối tác toàn diện cho doanh nghiệp.',
+  title: 'Lead API Tester | Salesforce',
+  description: 'Test REST API tạo Lead trên Salesforce',
   icons: {
     icon: [
       { url: '/favicon/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
