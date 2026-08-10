@@ -22,4 +22,13 @@ export const leadApi = {
             .get("/api/products", { headers })
             .then((res) => res.data?.programmes as { label: string; value: string }[]);
     },
+    getProvinces: (sfToken?: string) => {
+        const headers: Record<string, string> = {};
+        if (sfToken) {
+            headers["x-sf-access-token"] = sfToken;
+        }
+        return axios
+            .get("/api/provinces", { headers })
+            .then((res) => res.data?.provinces as { label: string; value: string }[]);
+    },
 };
