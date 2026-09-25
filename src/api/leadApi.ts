@@ -31,4 +31,13 @@ export const leadApi = {
             .get("/api/provinces", { headers })
             .then((res) => res.data?.provinces as { label: string; value: string }[]);
     },
+    getGroupProgrammes: (sfToken?: string) => {
+        const headers: Record<string, string> = {};
+        if (sfToken) {
+            headers["x-sf-access-token"] = sfToken;
+        }
+        return axios
+            .get("/api/group-programmes", { headers })
+            .then((res) => res.data?.groupProgrammes as { label: string; value: string }[]);
+    },
 };

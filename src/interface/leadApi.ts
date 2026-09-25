@@ -59,6 +59,7 @@ export interface ILeadApiPayload {
     LeadSource?: string;
     Interested_Programme__c?: string;
     Interested_Category__c?: string;
+    Group_Programme__c?: string;
     [key: string]: unknown;
 }
 
