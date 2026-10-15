@@ -37,6 +37,7 @@ next-env.d.ts
 pnpm-lock.yaml
 .env
 .env.local
+.env.*
 env
 .agent
 docs

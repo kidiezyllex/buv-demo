@@ -49,6 +49,22 @@ export const YOU_ARE_OPTIONS = [
 
 export type YouAreValue = (typeof YOU_ARE_OPTIONS)[number];
 
+export const LEAD_SOURCE_OPTIONS = [
+    "Website",
+    "MarComm",
+    "School",
+    "SRC Agent",
+    "Corporate",
+    "Recommender",
+    "Words of Mouth",
+    "Hotline",
+    "Barcode Check-in",
+    "EDP Recommender",
+    "EDP Agent",
+    "SRC Recommender",
+    "SPELL",
+] as const;
+
 export interface ILeadApiPayload {
     LastName?: string;
     Email?: string;

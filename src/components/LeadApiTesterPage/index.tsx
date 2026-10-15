@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
     Card,
@@ -35,8 +35,7 @@ import { toast } from "react-toastify";
 import {
     ILeadApiPayload,
     ILeadApiResult,
-    LEAD_API_ENDPOINTS,
-    LeadApiEndpointKey,
+    LEAD_SOURCE_OPTIONS,
     YOU_ARE_OPTIONS,
 } from "@/interface/leadApi";
 import { leadApi } from "@/api/leadApi";
@@ -55,7 +54,6 @@ const DEFAULT_FORM: ILeadApiPayload = {
 };
 
 export default function LeadApiTesterPage() {
-    const [endpoint, setEndpoint] = useState<LeadApiEndpointKey>("create-lead");
     const [form, setForm] = useState<ILeadApiPayload>(DEFAULT_FORM);
     const [programmes, setProgrammes] = useState<{ label: string; value: string }[]>([]);
     const [isLoadingProgrammes, setIsLoadingProgrammes] = useState(false);
@@ -98,19 +96,14 @@ export default function LeadApiTesterPage() {
     }, [sfToken]);
 
     useEffect(() => {
-        if (form.You_are__c !== "Student" || !sfToken || groupProgrammes.length > 0) return;
+        if (!sfToken) return;
         setIsLoadingGroupProgrammes(true);
         leadApi
             .getGroupProgrammes(sfToken)
             .then((data) => setGroupProgrammes(data || []))
             .catch(() => toast.error("Không lấy được danh sách nhóm chương trình từ Salesforce"))
             .finally(() => setIsLoadingGroupProgrammes(false));
-    }, [form.You_are__c, sfToken, groupProgrammes.length]);
-
-    const selectedEndpoint = useMemo(
-        () => LEAD_API_ENDPOINTS.find((item) => item.key === endpoint),
-        [endpoint]
-    );
+    }, [sfToken]);
 
     const updateField = (key: keyof ILeadApiPayload, value: string) => {
         setForm((prev) => ({ ...prev, [key]: value }));
@@ -135,7 +128,7 @@ export default function LeadApiTesterPage() {
         setIsSending(true);
         setResult(null);
         try {
-            const { status, body } = await leadApi.callEndpoint(endpoint, payload, sfToken);
+            const { status, body } = await leadApi.callEndpoint("create-lead", payload, sfToken);
             setResult({
                 status,
                 message: body?.Message || body?.message,
@@ -183,27 +176,57 @@ export default function LeadApiTesterPage() {
                     </CardHeader>
                     <CardContent className="space-y-3 md:space-y-4">
                         <div>
-                            <Label htmlFor="endpoint">API Endpoint</Label>
-                            <Select value={endpoint} onValueChange={(v) => setEndpoint(v as LeadApiEndpointKey)}>
-                                <SelectTrigger id="endpoint">
-                                    <SelectValue />
+                            <Label htmlFor="Group_Programme__c">Nhóm chương trình (Group Programme)</Label>
+                            <Select
+                                value={(form.Group_Programme__c as string) || undefined}
+                                onValueChange={(v) => updateField("Group_Programme__c", v === "none" ? "" : v)}
+                                disabled={isLoadingGroupProgrammes}
+                            >
+                                <SelectTrigger id="Group_Programme__c">
+                                    <SelectValue
+                                        placeholder={
+                                            isLoadingGroupProgrammes
+                                                ? "Đang tải danh sách nhóm chương trình..."
+                                                : "Chọn nhóm chương trình"
+                                        }
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {LEAD_API_ENDPOINTS.map((item) => (
-                                        <SelectItem key={item.key} value={item.key}>
-                                            {item.label}
+                                    <SelectItem value="none">-- Không chọn --</SelectItem>
+                                    {groupProgrammes.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                            {option.label}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
-                            {selectedEndpoint && (
-                                <p className="text-sm text-neutral-600 mt-1 italic">
-                                    {selectedEndpoint.description}
-                                </p>
-                            )}
                         </div>
 
-
+                        <div>
+                            <Label htmlFor="Interested_Programme__c">Chương trình quan tâm</Label>
+                            <Select
+                                value={(form.Interested_Programme__c as string) || undefined}
+                                onValueChange={(v) => updateField("Interested_Programme__c", v)}
+                                disabled={isLoadingProgrammes}
+                            >
+                                <SelectTrigger id="Interested_Programme__c">
+                                    <SelectValue
+                                        placeholder={
+                                            isLoadingProgrammes
+                                                ? "Đang tải danh sách chương trình..."
+                                                : "Chọn chương trình (không bắt buộc)"
+                                        }
+                                    />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {programmes.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
 
                         <div className="flex items-center gap-3 md:gap-4">
                             <h3 className="text-primary font-semibold whitespace-nowrap">7 trường bắt buộc</h3>
@@ -243,14 +266,7 @@ export default function LeadApiTesterPage() {
                                 <Label htmlFor="You_are__c">Vai trò (You are?)</Label>
                                 <Select
                                     value={(form.You_are__c as string) || undefined}
-                                    onValueChange={(v) => {
-                                        const role = v === "none" ? "" : v;
-                                        setForm((prev) => ({
-                                            ...prev,
-                                            You_are__c: role,
-                                            ...(role !== "Student" ? { Group_Programme__c: "" } : {}),
-                                        }));
-                                    }}
+                                    onValueChange={(v) => updateField("You_are__c", v === "none" ? "" : v)}
                                 >
                                     <SelectTrigger id="You_are__c">
                                         <SelectValue placeholder="Chọn vai trò" />
@@ -265,34 +281,6 @@ export default function LeadApiTesterPage() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            {form.You_are__c === "Student" && (
-                                <div>
-                                    <Label htmlFor="Group_Programme__c">Nhóm chương trình (Group Programme)</Label>
-                                    <Select
-                                        value={(form.Group_Programme__c as string) || undefined}
-                                        onValueChange={(v) => updateField("Group_Programme__c", v === "none" ? "" : v)}
-                                        disabled={isLoadingGroupProgrammes}
-                                    >
-                                        <SelectTrigger id="Group_Programme__c">
-                                            <SelectValue
-                                                placeholder={
-                                                    isLoadingGroupProgrammes
-                                                        ? "Đang tải danh sách nhóm chương trình..."
-                                                        : "Chọn nhóm chương trình"
-                                                }
-                                            />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="none">-- Không chọn --</SelectItem>
-                                            {groupProgrammes.map((option) => (
-                                                <SelectItem key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            )}
                             <div>
                                 <Label htmlFor="DOB__c" className="mb-2 block">Ngày sinh</Label>
                                 <DatePicker
@@ -333,41 +321,24 @@ export default function LeadApiTesterPage() {
                             </div>
                             <div>
                                 <Label htmlFor="LeadSource">Nguồn Lead</Label>
-                                <Input
-                                    id="LeadSource"
-                                    value={form.LeadSource as string}
-                                    onChange={(e) => updateField("LeadSource", e.target.value)}
-                                />
-                            </div>
-                        </div>
-
-                        {endpoint === "create-lead" && (
-                            <div>
-                                <Label htmlFor="Interested_Programme__c">Chương trình quan tâm</Label>
                                 <Select
-                                    value={(form.Interested_Programme__c as string) || undefined}
-                                    onValueChange={(v) => updateField("Interested_Programme__c", v)}
-                                    disabled={isLoadingProgrammes}
+                                    value={(form.LeadSource as string) || undefined}
+                                    onValueChange={(v) => updateField("LeadSource", v === "none" ? "" : v)}
                                 >
-                                    <SelectTrigger id="Interested_Programme__c">
-                                        <SelectValue
-                                            placeholder={
-                                                isLoadingProgrammes
-                                                    ? "Đang tải danh sách chương trình..."
-                                                    : "Chọn chương trình (không bắt buộc)"
-                                            }
-                                        />
+                                    <SelectTrigger id="LeadSource">
+                                        <SelectValue placeholder="Chọn nguồn lead" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {programmes.map((option) => (
-                                            <SelectItem key={option.value} value={option.value}>
-                                                {option.label}
+                                        <SelectItem value="none">-- Không chọn --</SelectItem>
+                                        {LEAD_SOURCE_OPTIONS.map((option) => (
+                                            <SelectItem key={option} value={option}>
+                                                {option}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
                             </div>
-                        )}
+                        </div>
 
                         <Button onClick={handleSend} disabled={isSending} className="w-full">
                             <Icon path={isSending ? mdiLoading : mdiSend} size={0.8} className={isSending ? "animate-spin flex-shrink-0" : "flex-shrink-0"} />
