@@ -21,7 +21,7 @@ global class APICreateLead {
             LandingPageToken__c landingPageToken = [SELECT Token_APICreatedLead__c FROM LandingPageToken__c LIMIT 1];
             String expectedToken = landingPageToken.Token_APICreatedLead__c;
             
-            //Cách này cũng đúng và dòng 26 cũng đúng 
+            //Cách này cũng đúng và dòng 26 cũng đúng nha
            /* RestRequest req = RestContext.request;
             Map<String, String> mpHeader = req.headers;
             string tokenFromHeader = mpHeader.get('Authorization_permanent'); */
