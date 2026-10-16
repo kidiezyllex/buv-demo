@@ -51,6 +51,7 @@ const DEFAULT_FORM: ILeadApiPayload = {
     LeadSource: "",
     Interested_Programme__c: "",
     Group_Programme__c: "",
+    UTM_Campaign__c: "",
 };
 
 export default function LeadApiTesterPage() {
@@ -74,6 +75,14 @@ export default function LeadApiTesterPage() {
         // Tự động kiểm tra và lấy token nếu chưa có hoặc đã hết hạn (không ép buộc refresh)
         fetchToken().catch(() => { });
     }, [fetchToken]);
+
+    useEffect(() => {
+        // Tự điền UTM Campaign nếu trang được mở từ link có tham số utm_campaign
+        const utmCampaign = new URLSearchParams(window.location.search).get("utm_campaign");
+        if (utmCampaign) {
+            setForm((prev) => ({ ...prev, UTM_Campaign__c: utmCampaign }));
+        }
+    }, []);
 
     useEffect(() => {
         if (!sfToken) return;
@@ -335,6 +344,21 @@ export default function LeadApiTesterPage() {
                                     </SelectContent>
                                 </Select>
                             </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 md:gap-4">
+                            <h3 className="text-primary font-semibold whitespace-nowrap">UTM (không bắt buộc)</h3>
+                            <div className="flex-1 border-b border-dashed border-primary mr-1" />
+                        </div>
+
+                        <div>
+                            <Label htmlFor="UTM_Campaign__c">UTM Campaign</Label>
+                            <Input
+                                id="UTM_Campaign__c"
+                                value={form.UTM_Campaign__c as string}
+                                onChange={(e) => updateField("UTM_Campaign__c", e.target.value)}
+                                placeholder="Mã chiến dịch (vd: open-day-2026) hoặc link có utm_campaign"
+                            />
                         </div>
 
                         <Button onClick={handleSend} disabled={isSending} className="w-full">
