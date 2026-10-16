@@ -66,7 +66,7 @@ export default function LeadApiTesterPage() {
         accessToken: sfToken,
         fetchToken
     } = useTokenStore();
-    //check 123
+    //check check
     const [isSending, setIsSending] = useState(false);
     const [result, setResult] = useState<ILeadApiResult | null>(null);
 
@@ -120,14 +120,9 @@ export default function LeadApiTesterPage() {
         return base;
     };
 
-
+    // Gửi request tới API Salesforce
 
     const handleSend = async () => {
-        if (!form.You_are__c) {
-            toast.error("Vui lòng chọn vai trò (You are?)");
-            return;
-        }
-
         const payload = buildPayload();
 
         setIsSending(true);
@@ -145,15 +140,12 @@ export default function LeadApiTesterPage() {
 
             if (status >= 200 && status < 300 && !body?.errorCode) {
                 toast.success("Gọi API thành công");
-            } else {
-                toast.warning(body?.Message || body?.message || "API trả về lỗi");
             }
         } catch (error: any) {
             setResult({
                 status: 0,
                 message: error?.message || "Không thể kết nối tới API",
             });
-            toast.error(error?.message || "Không thể kết nối tới API");
         } finally {
             setIsSending(false);
         }
