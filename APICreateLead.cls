@@ -96,6 +96,8 @@ global class APICreateLead {
                     // ma Gate 1 chi doc Email_check__c / Mobile_check__c. Ben goi nao gui Email /
                     // MobilePhone se bi danh Unqualified oan. Bu truong nguon truoc khi insert.
                     LeadIntakeFieldNormalizer.fillSourceFields(objJson);
+                    // 10/10/2026 (#4075): Working people/BUV Alumni -> Student, Parent -> Guardian.
+                    LeadIntakeFieldNormalizer.normalizeYouAre(objJson);
                     //objJson.Enable_Round_Robin__c = true;
                     //objJson.Run_Reassign__c = true;
                     //objJson.Campus__c = lstCampus[0].Id;
@@ -115,47 +117,52 @@ global class APICreateLead {
                     dml.DuplicateRuleHeader.AllowSave = true;
                     Database.SaveResult sr = Database.insert(objJson, dml);
                     if (sr.isSuccess()) {
-                        res.statusCode = 200;
-                        strResult = 'The request was a success.';
+                        strResult = LeadApiResponse.created(res, sr.getId());
                         objDevLog.isSuccess__c = true;
-                        objResult.data = objJson;
-                    } else {
-                        List<String> errMsgs = new List<String>();
-                        for (Database.Error err : sr.getErrors()) {
-                            errMsgs.add(err.getMessage());
+                        // TC-246: enquiry / yeu cau tu van 1-1 tu khach da co Opportunity dang mo ->
+                        // ghi Activity Timeline tren Contact + thong bao SR Owner. Loi o day KHONG duoc
+                        // lam hong API tao Lead.
+                        if (objJson.Is_In_Depth_Consultation__c == true || String.isNotBlank(objJson.Enquiry__c)) {
+                            try {
+                                ExistingOpportunityEnquiryService.handle(
+                                    objJson.Email,
+                                    String.isNotBlank(objJson.MobilePhone) ? objJson.MobilePhone : objJson.Phone,
+                                    objJson.Is_In_Depth_Consultation__c == true,
+                                    objJson.LeadSource,
+                                    objJson.Enquiry__c);
+                            } catch (Exception ex) {
+                                System.debug(LoggingLevel.ERROR, 'ExistingOpportunityEnquiryService: ' + ex.getMessage());
+                            }
                         }
-                        strResult = String.join(errMsgs, '; ');
-                        res.statusCode = 400;
+                    } else {
+                        strResult = LeadApiResponse.invalid(res, sr.getErrors());
                         objDevLog.isSuccess__c = false;
                     }
+                } else {
+                    strResult = LeadApiResponse.invalid(res, new List<LeadApiResponse.FieldError>{
+                        new LeadApiResponse.FieldError(null, 'Body request rỗng')
+                    });
+                    objDevLog.isSuccess__c = false;
                 }
             }else{
-                strResult = 'The token invalid';
-                res.statusCode = 401;
+                strResult = LeadApiResponse.unauthorized(res);
                 objDevLog.isSuccess__c = false;
             }
 
+        } catch(JSONException e) {
+            // Body sai cú pháp JSON hoặc sai kiểu dữ liệu (vd: DOB không đúng định dạng ngày)
+            strResult = LeadApiResponse.invalid(res, new List<LeadApiResponse.FieldError>{
+                new LeadApiResponse.FieldError(null, e.getMessage())
+            });
+            objDevLog.isSuccess__c = false;
         } catch(exception e) {
+            LeadApiResponse.serverError(res);
             strResult = e.getMessage() + '-' + e.getStackTraceString() + e.getLineNumber();
-            res.statusCode = 500;
+            objDevLog.isSuccess__c = false;
         }
 
-       // if(objDevLog.isSuccess__c == false){
-            objDevLog.Output__c = strResult;
-            insert objDevLog;
-
-            // All_Settings__c setting = All_Settings__c.getorgdefaults();
-            // Libraries.SendEmail('APIMioInvestor', objDevLog.Id + ': ' +strResult, setting.Email_Exception__c);
-       // }
-        objResult.message = strResult;
-        objResult.code = res.statusCode;
-        // Tạo JSON thủ công để đảm bảo thứ tự mong muốn
-        String responseBody = '{"Message":"' + objResult.message + '"';
-        if (objResult.code != null) {
-            responseBody += ',"Code":' + objResult.code;
-        }
-        responseBody += ',"data":' + JSON.serialize(objResult.Data) + '}';
-        res.responseBody = Blob.valueOf(responseBody);
+        objDevLog.Output__c = strResult;
+        insert objDevLog;
     }
 
     public class JsonResponse
