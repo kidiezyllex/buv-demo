@@ -123,6 +123,11 @@ export default function LeadApiTesterPage() {
 
 
     const handleSend = async () => {
+        if (!form.You_are__c) {
+            toast.error("Vui lòng chọn vai trò (You are?)");
+            return;
+        }
+
         const payload = buildPayload();
 
         setIsSending(true);
