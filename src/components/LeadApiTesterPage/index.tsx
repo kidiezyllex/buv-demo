@@ -66,7 +66,7 @@ export default function LeadApiTesterPage() {
         accessToken: sfToken,
         fetchToken
     } = useTokenStore();
-    //mic check check check
+    //mic 
     const [isSending, setIsSending] = useState(false);
     const [result, setResult] = useState<ILeadApiResult | null>(null);
 
