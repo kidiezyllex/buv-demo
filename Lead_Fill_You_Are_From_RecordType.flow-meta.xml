@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>60.0</apiVersion>
+    <assignments>
+        <name>Set_You_Are_Guardian</name>
+        <label>You Are = Guardian</label>
+        <locationX>314</locationX>
+        <locationY>278</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.You_are__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Guardian</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Set_You_Are_Student</name>
+        <label>You Are = Student</label>
+        <locationX>50</locationX>
+        <locationY>278</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.You_are__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Student</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>Check_Record_Type</name>
+        <label>Record Type cua Lead la gi?</label>
+        <locationX>176</locationX>
+        <locationY>158</locationY>
+        <defaultConnectorLabel>Record Type khac - khong dien</defaultConnectorLabel>
+        <rules>
+            <name>RT_Student</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.RecordType.DeveloperName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Student</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_You_Are_Student</targetReference>
+            </connector>
+            <label>RT Student</label>
+        </rules>
+        <rules>
+            <name>RT_Guardian</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.RecordType.DeveloperName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Guardian</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_You_Are_Guardian</targetReference>
+            </connector>
+            <label>RT Guardian</label>
+        </rules>
+    </decisions>
+    <description>Bo sung You_are__c cho Lead theo Record Type: Student -&gt; Student, Guardian -&gt; Guardian.
+
+CHI DIEN KHI You_are__c DANG RONG - tuyet doi khong ghi de. Ly do: You_are__c co 5 gia tri, trong khi
+Lead chi co 2 Record Type. Flow Lead_Auto_Assign_RecordType (chieu nguoc lai) gom &quot;Student/Working
+people/BUV Alumni&quot; ve RT Student va &quot;Guardian/Parent&quot; ve RT Guardian. Neu flow nay ghi de thi tren
+UAT2 se lam hong 31 Lead dang la &quot;Parent&quot; va 2 Lead dang la &quot;Working people&quot; (do 24/09/2026).
+
+Vi sao can: 2 Validation Rule bat buoc You_are__c (You_are_cannot_be_blank, API_Gate1_Required_YouAre)
+chi phu kenh nhap tay va API. Lead vao qua Import / Facebook / Digital khong bi chan nen co the rong.
+
+Before-save nen khong ton them DML va khong tao vong lap voi Lead_Auto_Assign_RecordType: hai flow
+co dieu kien loai tru nhau (flow kia chi chay khi You_are__c CO gia tri).</description>
+    <environments>Default</environments>
+    <interviewLabel>Lead Fill You Are From RecordType {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Lead - Bo sung You Are theo Record Type</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Check_Record_Type</targetReference>
+        </connector>
+        <filterFormula>AND( ISBLANK( TEXT( {!$Record.You_are__c} ) ), NOT( {!$Record.isAPI__c} ) )</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

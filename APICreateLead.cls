@@ -95,6 +95,22 @@ global class APICreateLead {
                     // 21/09/2026: API ep isAPI/isDigital = true nen ban ghi BAT BUOC di qua Gate 1,
                     // ma Gate 1 chi doc Email_check__c / Mobile_check__c. Ben goi nao gui Email /
                     // MobilePhone se bi danh Unqualified oan. Bu truong nguon truoc khi insert.
+                    // 16/10/2026: bo khoang trang, dau gach, dau cham, ngoac trong so dien thoai.
+                    // Dinh dang con lai do Validation Rule API_Gate1_Valid_MobilePhone kiem tra.
+                    if (String.isNotBlank(objJson.MobilePhone)) {
+                        objJson.MobilePhone = objJson.MobilePhone.replaceAll('[\\s\\-\\.\\(\\)]', '');
+                    }
+                    if (String.isNotBlank(objJson.Mobile_check__c)) {
+                        objJson.Mobile_check__c = objJson.Mobile_check__c.replaceAll('[\\s\\-\\.\\(\\)]', '');
+                    }
+                    // 16/10/2026: chi bo khoang trang o dau/cuoi email. Dau cach o giua giu nguyen de
+                    // Validation Rule API_Gate1_Valid_Email bao loi cho khach tu sua.
+                    if (String.isNotBlank(objJson.Email_check__c)) {
+                        objJson.Email_check__c = objJson.Email_check__c.trim();
+                    }
+                    if (String.isNotBlank(objJson.Email)) {
+                        objJson.Email = objJson.Email.trim();
+                    }
                     LeadIntakeFieldNormalizer.fillSourceFields(objJson);
                     // 16/10/2026: chan gia tri mac dinh "Student" cua Record Type khi ben goi khong gui
                     // You_are__c -> de Validation Rule API_Gate1_Required_YouAre bao loi dung.
@@ -106,8 +122,10 @@ global class APICreateLead {
                     //objJson.Enable_Round_Robin__c = true;
                     //objJson.Run_Reassign__c = true;
                     //objJson.Campus__c = lstCampus[0].Id;
+                    // 16/10/2026: bo mac dinh 'MarComm' va chan gia tri mac dinh cua Record Type
+                    // -> de Validation Rule API_Gate1_Required_LeadSource bao loi dung.
                     if(String.isBlank(objJson.LeadSource)){
-                        objJson.LeadSource = 'MarComm';  
+                        objJson.LeadSource = null;
                     }
                     
                     if(String.isBlank(objJson.Lead_Sub_Source__c)){

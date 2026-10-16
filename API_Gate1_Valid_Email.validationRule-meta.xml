@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>API_Gate1_Valid_Email</fullName>
+    <active>true</active>
+    <description>16/10/2026: Lead tao qua API phai co email dung dinh dang (khong dau cach, co @ va ten mien). Khoang trang dau/cuoi da duoc APICreateLead xoa truoc khi insert.</description>
+    <errorConditionFormula>AND(
+    ISNEW(),
+    isAPI__c,
+    OR(
+        AND(NOT(ISBLANK(Email)), NOT(REGEX(Email, &quot;^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$&quot;))),
+        AND(NOT(ISBLANK(Email_check__c)), NOT(REGEX(Email_check__c, &quot;^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$&quot;)))
+    )
+)</errorConditionFormula>
+    <errorDisplayField>Email</errorDisplayField>
+    <errorMessage>Field: Email is invalid</errorMessage>
+</ValidationRule>
