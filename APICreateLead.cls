@@ -43,7 +43,7 @@ global class APICreateLead {
                         programmeMap.put(programme.Id, programme);
                     }
                     
-                    // Mapping giá trị bắt buộc
+                    // Mapping giá trị bắt buộc kk
                    /* if(objJson.Interested_Programme__c != null) {
                         for(Product2 programme : lstProgramme) {
                             String programmeNameLowerCase = programme.Name.toLowerCase();
