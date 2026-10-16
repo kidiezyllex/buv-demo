@@ -65,6 +65,16 @@ export const LEAD_SOURCE_OPTIONS = [
     "SPELL",
 ] as const;
 
+// queryParam: tham số trên link dùng để tự điền.
+// UTM_CampaignMC__c không có ở đây vì Salesforce tự lấy từ UTM_Campaign__c.
+export const UTM_FIELDS = [
+    { key: "UTM_Campaign__c", label: "UTM Campaign", queryParam: "utm_campaign", placeholder: "Mã chiến dịch (vd: buvopenday) hoặc link có utm_campaign" },
+    { key: "UTM_Content__c", label: "UTM Content", queryParam: "utm_content", placeholder: "vd: banner-1" },
+    { key: "UTM_Medium__c", label: "UTM Medium", queryParam: "utm_medium", placeholder: "vd: cpc" },
+    { key: "UTM_Source__c", label: "UTM Source", queryParam: "utm_source", placeholder: "vd: facebook" },
+    { key: "UTM_Term__c", label: "UTM Term", queryParam: "utm_term", placeholder: "vd: open-day" },
+] as const;
+
 export interface ILeadApiPayload {
     LastName?: string;
     Email?: string;
@@ -77,6 +87,10 @@ export interface ILeadApiPayload {
     Interested_Category__c?: string;
     Group_Programme__c?: string;
     UTM_Campaign__c?: string;
+    UTM_Content__c?: string;
+    UTM_Medium__c?: string;
+    UTM_Source__c?: string;
+    UTM_Term__c?: string;
     [key: string]: unknown;
 }
 

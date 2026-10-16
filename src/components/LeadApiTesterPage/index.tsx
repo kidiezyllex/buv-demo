@@ -36,6 +36,7 @@ import {
     ILeadApiPayload,
     ILeadApiResult,
     LEAD_SOURCE_OPTIONS,
+    UTM_FIELDS,
     YOU_ARE_OPTIONS,
 } from "@/interface/leadApi";
 import { leadApi } from "@/api/leadApi";
@@ -52,6 +53,10 @@ const DEFAULT_FORM: ILeadApiPayload = {
     Interested_Programme__c: "",
     Group_Programme__c: "",
     UTM_Campaign__c: "",
+    UTM_Content__c: "",
+    UTM_Medium__c: "",
+    UTM_Source__c: "",
+    UTM_Term__c: "",
 };
 
 export default function LeadApiTesterPage() {
@@ -77,10 +82,15 @@ export default function LeadApiTesterPage() {
     }, [fetchToken]);
 
     useEffect(() => {
-        // Tự điền UTM Campaign nếu trang được mở từ link có tham số utm_campaign
-        const utmCampaign = new URLSearchParams(window.location.search).get("utm_campaign");
-        if (utmCampaign) {
-            setForm((prev) => ({ ...prev, UTM_Campaign__c: utmCampaign }));
+        // Tự điền các field UTM nếu trang được mở từ link có tham số utm_*
+        const params = new URLSearchParams(window.location.search);
+        const prefill: Partial<ILeadApiPayload> = {};
+        UTM_FIELDS.forEach((field) => {
+            const value = params.get(field.queryParam);
+            if (value) prefill[field.key] = value;
+        });
+        if (Object.keys(prefill).length > 0) {
+            setForm((prev) => ({ ...prev, ...prefill }));
         }
     }, []);
 
@@ -351,14 +361,18 @@ export default function LeadApiTesterPage() {
                             <div className="flex-1 border-b border-dashed border-primary mr-1" />
                         </div>
 
-                        <div>
-                            <Label htmlFor="UTM_Campaign__c">UTM Campaign</Label>
-                            <Input
-                                id="UTM_Campaign__c"
-                                value={form.UTM_Campaign__c as string}
-                                onChange={(e) => updateField("UTM_Campaign__c", e.target.value)}
-                                placeholder="Mã chiến dịch (vd: open-day-2026) hoặc link có utm_campaign"
-                            />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                            {UTM_FIELDS.map((field) => (
+                                <div key={field.key}>
+                                    <Label htmlFor={field.key}>{field.label}</Label>
+                                    <Input
+                                        id={field.key}
+                                        value={(form[field.key] as string) || ""}
+                                        onChange={(e) => updateField(field.key, e.target.value)}
+                                        placeholder={field.placeholder}
+                                    />
+                                </div>
+                            ))}
                         </div>
 
                         <Button onClick={handleSend} disabled={isSending} className="w-full">
