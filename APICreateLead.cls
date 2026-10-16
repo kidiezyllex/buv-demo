@@ -96,6 +96,11 @@ global class APICreateLead {
                     // ma Gate 1 chi doc Email_check__c / Mobile_check__c. Ben goi nao gui Email /
                     // MobilePhone se bi danh Unqualified oan. Bu truong nguon truoc khi insert.
                     LeadIntakeFieldNormalizer.fillSourceFields(objJson);
+                    // 16/10/2026: chan gia tri mac dinh "Student" cua Record Type khi ben goi khong gui
+                    // You_are__c -> de Validation Rule API_Gate1_Required_YouAre bao loi dung.
+                    if (String.isBlank(objJson.You_are__c)) {
+                        objJson.You_are__c = null;
+                    }
                     // 10/10/2026 (#4075): Working people/BUV Alumni -> Student, Parent -> Guardian.
                     LeadIntakeFieldNormalizer.normalizeYouAre(objJson);
                     //objJson.Enable_Round_Robin__c = true;
