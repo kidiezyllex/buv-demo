@@ -27,14 +27,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ end
         return NextResponse.json({ message: "Request body không phải JSON hợp lệ" }, { status: 400 });
     }
 
-    const youAre = (payload as Record<string, unknown> | null)?.You_are__c;
-    if (typeof youAre !== "string" || !youAre.trim()) {
-        return NextResponse.json(
-            { message: "Thiếu trường bắt buộc: You_are__c" },
-            { status: 400 }
-        );
-    }
-
     const customToken = req.headers.get("x-sf-access-token") || undefined;
 
     try {
