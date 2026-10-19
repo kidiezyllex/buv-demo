@@ -40,4 +40,13 @@ export const leadApi = {
             .get("/api/group-programmes", { headers })
             .then((res) => res.data?.groupProgrammes as { label: string; value: string }[]);
     },
+    getEventActivities: (sfToken?: string) => {
+        const headers: Record<string, string> = {};
+        if (sfToken) {
+            headers["x-sf-access-token"] = sfToken;
+        }
+        return axios
+            .get("/api/event-activities", { headers })
+            .then((res) => res.data?.eventActivities as { label: string; value: string }[]);
+    },
 };

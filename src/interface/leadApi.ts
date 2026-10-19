@@ -75,6 +75,13 @@ export const UTM_FIELDS = [
     { key: "UTM_Term__c", label: "UTM Term", queryParam: "utm_term", placeholder: "vd: open-day" },
 ] as const;
 
+export const EVENT_ACTIVITY_FIELDS = [
+    { key: "Event_Activity_1__c", label: "Event Activity 1" },
+    { key: "Event_Activity_2__c", label: "Event Activity 2" },
+    { key: "Event_Activity_3__c", label: "Event Activity 3" },
+    { key: "Event_Activity_4__c", label: "Event Activity 4" },
+] as const;
+
 export interface ILeadApiPayload {
     LastName?: string;
     Email?: string;
@@ -88,6 +95,10 @@ export interface ILeadApiPayload {
     Group_Programme__c?: string;
     UTM_Campaign__c?: string;
     UTM_Content__c?: string;
+    Event_Activity_1__c?: string;
+    Event_Activity_2__c?: string;
+    Event_Activity_3__c?: string;
+    Event_Activity_4__c?: string;
     UTM_Medium__c?: string;
     UTM_Source__c?: string;
     UTM_Term__c?: string;

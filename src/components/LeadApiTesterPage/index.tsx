@@ -36,6 +36,7 @@ import {
     ILeadApiPayload,
     ILeadApiResult,
     LEAD_SOURCE_OPTIONS,
+    EVENT_ACTIVITY_FIELDS,
     UTM_FIELDS,
     YOU_ARE_OPTIONS,
 } from "@/interface/leadApi";
@@ -67,6 +68,8 @@ export default function LeadApiTesterPage() {
     const [isLoadingProvinces, setIsLoadingProvinces] = useState(false);
     const [groupProgrammes, setGroupProgrammes] = useState<{ label: string; value: string }[]>([]);
     const [isLoadingGroupProgrammes, setIsLoadingGroupProgrammes] = useState(false);
+    const [eventActivities, setEventActivities] = useState<{ label: string; value: string }[]>([]);
+    const [isLoadingEventActivities, setIsLoadingEventActivities] = useState(false);
 
     const {
         accessToken: sfToken,
@@ -122,6 +125,16 @@ export default function LeadApiTesterPage() {
             .then((data) => setGroupProgrammes(data || []))
             .catch(() => toast.error("Không lấy được danh sách nhóm chương trình từ Salesforce"))
             .finally(() => setIsLoadingGroupProgrammes(false));
+    }, [sfToken]);
+
+    useEffect(() => {
+        if (!sfToken) return;
+        setIsLoadingEventActivities(true);
+        leadApi
+            .getEventActivities(sfToken)
+            .then((data) => setEventActivities(data || []))
+            .catch(() => toast.error("Không lấy được danh sách hoạt động từ Salesforce"))
+            .finally(() => setIsLoadingEventActivities(false));
     }, [sfToken]);
 
     const updateField = (key: keyof ILeadApiPayload, value: string) => {
@@ -354,6 +367,50 @@ export default function LeadApiTesterPage() {
                                     </SelectContent>
                                 </Select>
                             </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 md:gap-4">
+                            <h3 className="text-primary font-semibold whitespace-nowrap">Hoạt động sự kiện (không bắt buộc)</h3>
+                            <div className="flex-1 border-b border-dashed border-primary mr-1" />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                            {EVENT_ACTIVITY_FIELDS.map((field) => {
+                                // Hoạt động đã chọn ở ô khác thì không cho chọn lại
+                                const takenElsewhere = EVENT_ACTIVITY_FIELDS.filter((f) => f.key !== field.key)
+                                    .map((f) => form[f.key])
+                                    .filter(Boolean);
+                                return (
+                                    <div key={field.key}>
+                                        <Label htmlFor={field.key}>{field.label}</Label>
+                                        <Select
+                                            value={(form[field.key] as string) || "none"}
+                                            onValueChange={(v) => updateField(field.key, v === "none" ? "" : v)}
+                                            disabled={isLoadingEventActivities}
+                                        >
+                                            <SelectTrigger id={field.key}>
+                                                <SelectValue
+                                                    placeholder={
+                                                        isLoadingEventActivities ? "Đang tải danh sách hoạt động..." : "Chọn hoạt động"
+                                                    }
+                                                />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="none">-- Không chọn --</SelectItem>
+                                                {eventActivities.map((option) => (
+                                                    <SelectItem
+                                                        key={option.value}
+                                                        value={option.value}
+                                                        disabled={takenElsewhere.includes(option.value)}
+                                                    >
+                                                        {option.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                );
+                            })}
                         </div>
 
                         <div className="flex items-center gap-3 md:gap-4">
